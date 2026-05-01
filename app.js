@@ -175,6 +175,21 @@ function closeSidebar() {
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- NUMBERS ONLY: block letters on all contact fields ---
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', () => {
+            // Strip anything that's not a digit
+            input.value = input.value.replace(/\D/g, '');
+        });
+        input.addEventListener('keydown', (e) => {
+            // Allow: backspace, delete, tab, arrows, home, end
+            const allowed = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'];
+            if (allowed.includes(e.key)) return;
+            // Block if not a digit
+            if (!/^\d$/.test(e.key)) e.preventDefault();
+        });
+    });
+
     // --- HAMBURGER MENU TOGGLE ---
     document.getElementById('hamburgerBtn').addEventListener('click', () => {
         document.querySelector('.sidebar').classList.contains('open')
@@ -198,38 +213,85 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- URGENT REQUEST FORM ---
     document.getElementById('requestForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const newRequest = {
-            id: 'req-' + Date.now(),
-            patient: document.getElementById('patientName').value.trim(),
-            bloodType: document.getElementById('bloodType').value,
-            city: document.getElementById('city').value.trim(),
-            hospital: document.getElementById('hospital').value.trim(),
-            contact: document.getElementById('contact').value.trim(),
-            timestamp: Date.now()
-        };
-        const requests = getRequests();
-        requests.push(newRequest);
-        saveRequests(requests);
-        renderUrgentFeed();
-        e.target.reset();
+        const patient  = document.getElementById('patientName').value.trim();
+        const bloodType = document.getElementById('bloodType').value;
+        const city     = document.getElementById('city').value.trim();
+        const hospital = document.getElementById('hospital').value.trim();
+        const contact  = document.getElementById('contact').value.trim();
+
+        Swal.fire({
+            title: 'Post Urgent Request?',
+            html: `You are posting an urgent request for <b>${patient}</b> needing <b>${bloodType}</b> blood at <b>${hospital}</b>, ${city}.`,
+            icon: 'warning',
+            iconColor: '#E63946',
+            showCancelButton: true,
+            confirmButtonColor: '#E63946',
+            cancelButtonColor: '#adb5bd',
+            confirmButtonText: '🚨 Yes, Post Now!',
+            cancelButtonText: 'Cancel',
+            borderRadius: '16px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const newRequest = { id: 'req-' + Date.now(), patient, bloodType, city, hospital, contact, timestamp: Date.now() };
+                const requests = getRequests();
+                requests.push(newRequest);
+                saveRequests(requests);
+                renderUrgentFeed();
+                document.getElementById('requestForm').reset();
+
+                Swal.fire({
+                    title: 'Request Posted!',
+                    html: `Your request is now <b>live</b> on the board.<br>Donors in <b>${city}</b> can see it now.`,
+                    icon: 'success',
+                    iconColor: '#E63946',
+                    confirmButtonColor: '#E63946',
+                    confirmButtonText: 'Got it!',
+                    timer: 4000,
+                    timerProgressBar: true
+                });
+            }
+        });
     });
 
     // --- DONOR REGISTRATION FORM ---
     document.getElementById('donorForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const newDonor = {
-            id: 'don-' + Date.now(),
-            name: document.getElementById('donorName').value.trim(),
-            bloodType: document.getElementById('donorBlood').value,
-            city: document.getElementById('donorCity').value.trim(),
-            contact: document.getElementById('donorContact').value.trim(),
-            timestamp: Date.now()
-        };
-        const donors = getDonors();
-        donors.push(newDonor);
-        saveDonors(donors);
-        renderDonorFeed();
-        e.target.reset();
+        const name      = document.getElementById('donorName').value.trim();
+        const bloodType = document.getElementById('donorBlood').value;
+        const city      = document.getElementById('donorCity').value.trim();
+        const contact   = document.getElementById('donorContact').value.trim();
+
+        Swal.fire({
+            title: 'Register as Donor?',
+            html: `<b>${name}</b>, you are registering as a <b>${bloodType}</b> donor in <b>${city}</b>.<br><br>Your contact number will be visible to patients in need.`,
+            icon: 'question',
+            iconColor: '#E63946',
+            showCancelButton: true,
+            confirmButtonColor: '#E63946',
+            cancelButtonColor: '#adb5bd',
+            confirmButtonText: '🩸 Yes, Register!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const newDonor = { id: 'don-' + Date.now(), name, bloodType, city, contact, timestamp: Date.now() };
+                const donors = getDonors();
+                donors.push(newDonor);
+                saveDonors(donors);
+                renderDonorFeed();
+                document.getElementById('donorForm').reset();
+
+                Swal.fire({
+                    title: 'Thank You! 🩸',
+                    html: `You are now registered as a <b>${bloodType}</b> donor in <b>${city}</b>.<br>Patients can now find and contact you.`,
+                    icon: 'success',
+                    iconColor: '#E63946',
+                    confirmButtonColor: '#E63946',
+                    confirmButtonText: 'Awesome!',
+                    timer: 4000,
+                    timerProgressBar: true
+                });
+            }
+        });
     });
 
     // --- FIND MATCH SEARCH ---
