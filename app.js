@@ -156,15 +156,39 @@ function navigate(page) {
 }
 
 // =============================================
+// HAMBURGER MENU (Mobile)
+// =============================================
+function openSidebar() {
+    document.querySelector('.sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('visible');
+    document.getElementById('hamburgerBtn').classList.add('open');
+}
+
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('visible');
+    document.getElementById('hamburgerBtn').classList.remove('open');
+}
+
+// =============================================
 // INIT
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- HAMBURGER MENU TOGGLE ---
+    document.getElementById('hamburgerBtn').addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.contains('open')
+            ? closeSidebar()
+            : openSidebar();
+    });
+    document.getElementById('overlay').addEventListener('click', closeSidebar);
 
     // Wire up nav links
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             navigate(link.dataset.page);
+            closeSidebar(); // auto-close on mobile after nav
         });
     });
 
