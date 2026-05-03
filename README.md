@@ -95,7 +95,6 @@ BloodLinePh/
 ## ⚠️ Disclaimer
 
 This application is a **student academic prototype** only. It was built to demonstrate how IT can be applied to solve real-world problems aligned with the United Nations Sustainable Development Goals (SDGs). It is **not** intended for actual medical use.
-kkk
 ---
 
 *Created for Contemporary World — Final Project | Academic Year 2025–2026*
